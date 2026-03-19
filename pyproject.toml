@@ -1,0 +1,22 @@
+[build-system]
+build-backend = 'setuptools.build_meta'
+requires = [
+    'setuptools',
+]
+
+[project]
+name = "roguelike-algorithms"
+version = "0.1.0"
+readme = "README.md"
+authors = [
+  {name = "Filip Adamus", email = "filipadamus1997@gmail.com"},
+]
+description = "Python practice project focusing on traditional roguelike adjacent algorithms and practices."
+keywords = ["python", "traditional roguelikes", "algorithms"]
+
+[project.urls]
+Repository = "https://github.com/FilipAdamus97/roguelike-algorithms"
+
+[tool.setuptools.packages.find]
+where = ["src/"]
+include = ["grid", "pathfinding"]
