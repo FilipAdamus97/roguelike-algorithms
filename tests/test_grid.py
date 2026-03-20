@@ -1,5 +1,6 @@
 
 from grid.grid import Grid
+import pytest
 
 def test_grid_initialization():
     grid = Grid(5, 5, walls={(1, 1), (2, 2)})
@@ -7,15 +8,19 @@ def test_grid_initialization():
     assert grid.height == 5
     assert grid.walls == {(1, 1), (2, 2)}
 
+def test_grid_no_walls():
     grid_no_walls = Grid(3, 3)
     assert grid_no_walls.width == 3
     assert grid_no_walls.height == 3
     assert grid_no_walls.walls == set()
 
-    grid_strange_positions = Grid(-2, -2, walls={(1, 1), (6, 6), (-1, -1)})
-    assert grid_strange_positions.width == -2
-    assert grid_strange_positions.height == -2
-    assert grid_strange_positions.walls == {(1, 1), (6, 6), (-1, -1)}
+def test_grid_dimensions_below_zero():
+    with pytest.raises(ValueError, match="Width and height must be positive integers."):
+        Grid(-2, -2, walls={(1, 1), (6, 6), (-1, -1)})
+
+def test_grid_wall_out_of_bounds():
+    with pytest.raises(ValueError, match="Wall position .* is out of bounds."):
+        Grid(5, 5, walls={(1, 1), (6, 6), (-1, -1)})
 
 def test_passable():
     grid = Grid(5, 5, walls={(1, 1), (2, 2)})
@@ -23,7 +28,7 @@ def test_passable():
     assert grid.passable((1, 1)) == False
     assert grid.passable((2, 2)) == False
     assert grid.passable((3, 3)) == True
-    assert grid.passable((-1, -1)) == True
+    assert grid.passable((-1, -1)) == False  # Out of bounds
 
 def test_bounds():
     grid = Grid(5, 5)
