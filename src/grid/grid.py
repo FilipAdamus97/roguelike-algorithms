@@ -8,9 +8,10 @@ class Grid:
         self.width = width
         self.height = height
 
-        for wall in walls or []:
-            if not self.in_bounds(wall):
-                raise ValueError(f"Wall position {wall} is out of bounds.")
+        if walls:
+            for wall in walls:
+                if not self.in_bounds(wall):
+                    raise ValueError(f"Wall position {wall} is out of bounds.")
         self.walls = set(walls) if walls else set()
 
     def in_bounds(self, pos: tuple[int, int]) -> bool:

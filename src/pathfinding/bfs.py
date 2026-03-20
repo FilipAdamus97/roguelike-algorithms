@@ -9,6 +9,10 @@ def bfs(
     """Perform Breadth-First Search (BFS) to find the shortest path from start to goal on the grid."""
     if not grid.in_bounds(start) or not grid.in_bounds(goal):
         raise ValueError("Start and goal positions must be within the bounds of the grid.")
+
+    if start == goal:
+        return [start]
+
     frontier = deque([start])
     came_from = {start: None}
 
@@ -26,7 +30,7 @@ def bfs(
     return reconstruct_path(came_from, start, goal)
 
 def reconstruct_path(
-        came_from: dict[tuple[int, int], tuple[int, int]] | None,
+        came_from: dict[tuple[int, int], tuple[int, int] | None],
         start: tuple[int, int],
         goal: tuple[int, int]
         ) -> list[tuple[int, int]] | None:
