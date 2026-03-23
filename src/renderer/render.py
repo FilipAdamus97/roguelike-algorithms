@@ -41,3 +41,4 @@ class Renderer:
                 else:
                     row.append(self.legend["Empty"])
             print("".join(row))
+        print() # Add an empty line after last row for better readability

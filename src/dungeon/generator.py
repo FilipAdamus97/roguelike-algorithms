@@ -1,0 +1,56 @@
+import random
+from grid import Grid
+from pathfinding import bfs
+
+def generate_dungeon(width: int, height: int, number_of_rooms: int = 4) -> Grid:
+    """Generate a simple dungeon layout using a grid."""
+    dungeon = Grid(width, height)
+    dungeon = dungeon.reverse_fields()  # Start with all walls
+    rooms = []
+    for iterator in range(number_of_rooms):
+        room_width = random.randint(3, 8)
+        room_height = random.randint(3, 8)
+        x = random.randint(0, width - room_width)
+        y = random.randint(0, height - room_height)
+
+        for i in range(len(rooms)):
+            existing_room = rooms[i]
+            if (x < existing_room[0] + existing_room[2] + 1 and
+                x + room_width > existing_room[0] - 1 and
+                y < existing_room[1] + existing_room[3] + 1 and
+                y + room_height > existing_room[1] - 1):
+                # This room overlaps with an existing room, try again
+                iterator -= 1
+                break
+
+        rooms.append((x, y, room_width, room_height))
+
+    for room in rooms:
+        carve_room(room, dungeon)
+
+    connect_rooms(rooms, dungeon)
+
+    return dungeon
+
+def carve_room(room: tuple[int, int, int, int], dungeon: Grid):
+    """Carve out a room in the dungeon grid."""
+    x, y, room_width, room_height = room
+    for i in range(x, x + room_width):
+        for j in range(y, y + room_height):
+            dungeon.walls.discard((i, j))  # Remove walls to create open space
+
+def carve_corridor(start: tuple[int, int], end: tuple[int, int], dungeon: Grid):
+    """Carve a corridor between two points in the dungeon grid."""
+    for x in range(min(start[0], end[0]), max(start[0], end[0]) + 1):
+        dungeon.walls.discard((x, start[1]))  # Carve horizontal corridor
+    for y in range(min(start[1], end[1]), max(start[1], end[1]) + 1):
+        dungeon.walls.discard((end[0], y))  # Carve vertical corridor
+
+def connect_rooms(rooms: list[tuple[int, int, int, int]], dungeon: Grid):
+    """Connect all rooms in the dungeon with corridors."""
+    for i in range(len(rooms) - 1):
+        room_a = rooms[i]
+        room_b = rooms[i + 1]
+        start = (room_a[0] + room_a[2] // 2, room_a[1] + room_a[3] // 2)  # Center of room A
+        end = (room_b[0] + room_b[2] // 2, room_b[1] + room_b[3] // 2)  # Center of room B
+        carve_corridor(start, end, dungeon)

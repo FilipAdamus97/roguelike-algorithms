@@ -36,3 +36,12 @@ class Grid:
         results = filter(self.in_bounds, directions)
         results = filter(self.passable, results)
         return list(results)
+
+    def reverse_fields(self):
+        """Return a new grid with walls and open spaces reversed."""
+        new_walls = set()
+        for x in range(self.width):
+            for y in range(self.height):
+                if (x, y) not in self.walls:
+                    new_walls.add((x, y))
+        return Grid(self.width, self.height, new_walls)
