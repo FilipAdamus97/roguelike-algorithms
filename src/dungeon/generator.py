@@ -14,13 +14,13 @@ def generate_dungeon(width: int, height: int, number_of_rooms: int = 4) -> Grid:
         x = random.randint(0, width - room_width - 1)
         y = random.randint(0, height - room_height - 1)
 
-        for i in range(len(rooms)):
-            existing_room = rooms[i]
+        for existing_room in rooms:
             if (x < existing_room[0] + existing_room[2] + 1 and
                 x + room_width > existing_room[0] - 1 and
                 y < existing_room[1] + existing_room[3] + 1 and
                 y + room_height > existing_room[1] - 1):
                 overlaps = True
+                break
 
         if not overlaps:
             rooms.append((x, y, room_width, room_height))
@@ -39,16 +39,27 @@ def carve_room(room: tuple[int, int, int, int], dungeon: Grid):
 
 def carve_corridor(start: tuple[int, int], end: tuple[int, int], dungeon: Grid):
     """Carve a corridor between two points in the dungeon grid."""
-    for x in range(min(start[0], end[0]), max(start[0], end[0]) + 1):
-        dungeon.walls.discard((x, start[1]))  # Carve horizontal corridor
-    for y in range(min(start[1], end[1]), max(start[1], end[1]) + 1):
-        dungeon.walls.discard((end[0], y))  # Carve vertical corridor
+    if random.choice([True, False]):
+        for x in range(min(start[0], end[0]), max(start[0], end[0]) + 1):
+            dungeon.walls.discard((x, start[1]))  # Carve horizontal corridor
+        for y in range(min(start[1], end[1]), max(start[1], end[1]) + 1):
+            dungeon.walls.discard((end[0], y))  # Carve vertical corridor
+    else:
+        for y in range(min(start[1], end[1]), max(start[1], end[1]) + 1):
+            dungeon.walls.discard((start[0], y))  # Carve vertical corridor
+        for x in range(min(start[0], end[0]), max(start[0], end[0]) + 1):
+            dungeon.walls.discard((x, end[1]))  # Carve horizontal corridor
+
+def room_center(room: tuple[int, int, int, int]) -> tuple[int, int]:
+    """Return the center points of the rooms."""
+    x, y, room_width, room_height = room
+    return (x + room_width // 2, y + room_height // 2)
 
 def connect_rooms(rooms: list[tuple[int, int, int, int]], dungeon: Grid):
     """Connect all rooms in the dungeon with corridors."""
     for i in range(len(rooms) - 1):
         room_a = rooms[i]
         room_b = rooms[i + 1]
-        start = (room_a[0] + room_a[2] // 2, room_a[1] + room_a[3] // 2)  # Center of room A
-        end = (room_b[0] + room_b[2] // 2, room_b[1] + room_b[3] // 2)  # Center of room B
+        start = room_center(room_a)
+        end = room_center(room_b)
         carve_corridor(start, end, dungeon)
