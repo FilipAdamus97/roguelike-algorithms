@@ -7,11 +7,12 @@ def generate_dungeon(width: int, height: int, number_of_rooms: int = 4) -> Grid:
     dungeon = Grid(width, height)
     dungeon = dungeon.reverse_fields()  # Start with all walls
     rooms = []
-    for iterator in range(number_of_rooms):
+    while len(rooms) < number_of_rooms:
+        overlaps = False
         room_width = random.randint(3, 8)
         room_height = random.randint(3, 8)
-        x = random.randint(0, width - room_width)
-        y = random.randint(0, height - room_height)
+        x = random.randint(0, width - room_width - 1)
+        y = random.randint(0, height - room_height - 1)
 
         for i in range(len(rooms)):
             existing_room = rooms[i]
@@ -19,17 +20,14 @@ def generate_dungeon(width: int, height: int, number_of_rooms: int = 4) -> Grid:
                 x + room_width > existing_room[0] - 1 and
                 y < existing_room[1] + existing_room[3] + 1 and
                 y + room_height > existing_room[1] - 1):
-                # This room overlaps with an existing room, try again
-                iterator -= 1
-                break
+                overlaps = True
 
-        rooms.append((x, y, room_width, room_height))
+        if not overlaps:
+            rooms.append((x, y, room_width, room_height))
 
     for room in rooms:
         carve_room(room, dungeon)
-
     connect_rooms(rooms, dungeon)
-
     return dungeon
 
 def carve_room(room: tuple[int, int, int, int], dungeon: Grid):
